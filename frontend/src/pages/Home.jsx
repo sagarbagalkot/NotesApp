@@ -2,38 +2,43 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import NoteModel from "../Components/NoteModel";
 import NoteCard from "../Components/NoteCard";
-import { useAuth } from "../context/ContexProvider";
+import { useAuth, BASE_URL } from "../context/ContexProvider"; // import BASE_URL
 import { toast } from "react-toastify";
 
 const Home = ({ searchQuery }) => {
   const [notes, setNotes] = useState([]);
   const [isModelOpen, setModelOpen] = useState(false);
   const { user } = useAuth();
-  const token = "user123"; 
+  const token = "user123"; // you can replace this with actual JWT if needed
 
+  // Fetch notes
   const fetchNotes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/notes", {
+      const res = await axios.get(`${BASE_URL}/notes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(res.data);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to fetch notes");
     }
   };
 
+  // Delete note
   const deleteNote = async (id) => {
     if (!user) {
-      toast.error("Login first ");
+      toast.error("Login first");
       return;
     }
     try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`, {
+      await axios.delete(`${BASE_URL}/notes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(notes.filter((note) => note._id !== id));
+      toast.success("Note deleted");
     } catch (err) {
       console.error(err);
+      toast.error("Failed to delete note");
     }
   };
 
@@ -50,7 +55,9 @@ const Home = ({ searchQuery }) => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-2 sm:p-2 md:p-4">
-      <h1 className="text-2xl sm:text-2xl md:text-3xl font-bold text-center mb-5 sm:mb-6">Your Notes</h1>
+      <h1 className="text-2xl sm:text-2xl md:text-3xl font-bold text-center mb-5 sm:mb-6">
+        Your Notes
+      </h1>
 
       <button
         onClick={() => {
