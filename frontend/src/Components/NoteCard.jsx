@@ -15,7 +15,6 @@ const NoteCard = ({ note, deleteNote }) => {
 
     try {
       await deleteNote(note._id);
-
       toast.success("Note deleted successfully 🗑️", {
         toastId: "delete-success",
       });
@@ -28,21 +27,25 @@ const NoteCard = ({ note, deleteNote }) => {
 
   return (
     <div className="bg-white p-4 sm:p-5 rounded-lg shadow-md border border-gray-200 flex flex-col justify-between transition hover:shadow-lg">
-
+      
+      {/* Note title */}
       <h2 className="font-semibold text-teal-700 text-base sm:text-lg truncate">
         {note.title}
       </h2>
 
       <hr className="my-2 border-gray-300" />
 
+      {/* Note content */}
       <p className="text-gray-700 text-sm sm:text-base leading-relaxed truncate">
         {note.content}
       </p>
 
+      {/* Created date */}
       <p className="text-gray-400 text-xs sm:text-sm mt-2 text-right">
         {new Date(note.createdAt).toLocaleString()}
       </p>
 
+      {/* Delete button */}
       {deleteNote && (
         <button
           onClick={handleDelete}
