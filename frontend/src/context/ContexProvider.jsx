@@ -1,16 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-
-export const BASE_URL = "https://notesapp-backend-wloz.onrender.com/api"; // deployed backend
+import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
+export const BASE_URL = "https://notesapp-backend-wloz.onrender.com/api";
 
 export const ContexProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) setUser(savedUser);
-  }, []);
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null
+  );
 
   const login = (userData) => {
     setUser(userData);
