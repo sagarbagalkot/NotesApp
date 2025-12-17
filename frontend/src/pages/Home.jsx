@@ -38,7 +38,7 @@ const Home = ({ searchQuery }) => {
       });
 
       setNotes((prev) => prev.filter((note) => note._id !== id));
-      toast.success("Note deleted 🗑️");
+      toast.success();
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete note");
