@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/ContexProvider";
+import { useAuth, BASE_URL } from "../context/ContexProvider"; // use BASE_URL
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -15,7 +15,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password,
       });
@@ -55,7 +55,7 @@ function Login() {
           required
         />
 
-        <button className="bg-orange-500 text-white w-full py-2 rounded text-sm sm:text-base  hover:bg-orange-300 transition">
+        <button className="bg-orange-500 text-white w-full py-2 rounded text-sm sm:text-base hover:bg-orange-300 transition">
           Login
         </button>
 
