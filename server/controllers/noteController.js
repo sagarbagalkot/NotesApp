@@ -1,80 +1,53 @@
-import { Note } from "../models/noteModel.js";
 import jwt from "jsonwebtoken";
+import { Note } from "../models/noteModel.js";
 
-// ---------------- GET NOTES ----------------
+const JWT_SECRET = "secret123"; // same as login
+
+// GET NOTES
 export const getNotes = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ error: "No token provided" });
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, "secret123"); // same secret as login
-    const userId = decoded.id;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const notes = await Note.find({ user: decoded.id });
 
-    const notes = await Note.find({ user: userId });
-    res.status(200).json(notes);
-  } catch (error) {
-    console.error("Get notes error:", error);
-    res.status(500).json({ error: "Failed to fetch notes" });
+    res.json(notes);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch notes" });
   }
 };
 
-// ---------------- ADD NOTE ----------------
+// ADD NOTE
 export const addNote = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ error: "No token provided" });
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token" });
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, "secret123");
-    const userId = decoded.id;
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     const { title, content } = req.body;
-    if (!title || !content) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
+    if (!title || !content)
+      return res.status(400).json({ message: "All fields required" });
 
-    const note = new Note({
+    const note = await Note.create({
       title,
       content,
-      user: userId,
+      user: decoded.id,
     });
 
-    const savedNote = await note.save();
-    res.status(201).json(savedNote);
-  } catch (error) {
-    console.error("Add note error:", error);
-    res.status(500).json({ error: "Failed to add note" });
+    res.status(201).json(note);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add note" });
   }
 };
 
-// ---------------- DELETE NOTE ----------------
+// DELETE NOTE
 export const deleteNote = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ error: "No token provided" });
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, "secret123");
-    const userId = decoded.id;
-
-    const noteId = req.params.id;
-
-    const note = await Note.findById(noteId);
-    if (!note) return res.status(404).json({ error: "Note not found" });
-
-    // ✅ Optional: make sure user can delete only their notes
-    if (note.user.toString() !== userId) {
-      return res.status(403).json({ error: "Not authorized to delete this note" });
-    }
-
-    await Note.findByIdAndDelete(noteId);
-    res.status(200).json({ message: "Note deleted successfully" });
-  } catch (error) {
-    console.error("Delete note error:", error);
-    res.status(500).json({ error: "Failed to delete note" });
+    await Note.findByIdAndDelete(req.params.id);
+    res.json({ message: "Note deleted" });
+  } catch {
+    res.status(500).json({ message: "Delete failed" });
   }
 };
