@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BASE_URL } from "../context/ContexProvider"; // use deployed backend URL
+import { useAuth, BASE_URL } from "../context/ContexProvider";
 
 const NoteModel = ({ setModelOpen, fetchNotes }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const token = "user123"; // replace with actual JWT if needed
+
+  const { user } = useAuth(); // Get logged-in user and token
 
   const addNote = async (e) => {
     e.preventDefault();
@@ -16,22 +17,28 @@ const NoteModel = ({ setModelOpen, fetchNotes }) => {
       return;
     }
 
+    if (!user?.token) {
+      toast.error("Login first to add a note ❌");
+      return;
+    }
+
     try {
       await axios.post(
         `${BASE_URL}/notes/add`,
         { title, content },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${user.token}` }, // Use real token
+        }
       );
 
       toast.success("Note added successfully ✅");
-
-      fetchNotes();      
-      setModelOpen(false);
+      fetchNotes();       // Refresh notes after adding
+      setModelOpen(false); // Close modal
       setTitle("");
       setContent("");
     } catch (err) {
       console.error("Error adding note:", err);
-      toast.error(err.response?.data?.error || "Failed to add note ❌");
+      toast.error(err.response?.data?.message || "Failed to add note ❌");
     }
   };
 
