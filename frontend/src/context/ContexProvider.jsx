@@ -7,13 +7,8 @@ const AuthContext = createContext();
 export const ContexProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const login = (data) => {
-    setUser(data); // { user, token }
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
+  const login = (data) => setUser(data);
+  const logout = () => setUser(null);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
