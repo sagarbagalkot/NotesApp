@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+export const BASE_URL = "https://notesapp-backend-wloz.onrender.com/api"; // deployed backend
+
 const AuthContext = createContext();
 
 export const ContexProvider = ({ children }) => {
@@ -12,7 +14,7 @@ export const ContexProvider = ({ children }) => {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData)); // store token
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
